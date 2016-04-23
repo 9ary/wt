@@ -1,0 +1,6 @@
+build
+.ninja_log
+.ninja_deps
+targets.ninja
+
+*.pyc

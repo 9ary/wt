@@ -1,0 +1,17 @@
+rule cc
+    command = $cc $cflags -MMD -MT $out -MF $out.d -c $in -o $out
+    description = CC $out
+    depfile = $out.d
+    deps = gcc
+
+rule ccld
+    command = $cc $ldflags $libs $in -o $out
+    description = CCLD $out
+
+include targets.ninja
+
+cc = clang
+
+ldflags = -fuse-ld=gold -flto
+
+default $builddir/wt

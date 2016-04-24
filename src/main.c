@@ -11,18 +11,18 @@ int main(int argc, char *argv[])
     (void) argc;
     (void) argv;
 
-    int _;
+    int rc;
     struct pty pty;
 
-    _ = forkpty(&pty);
-    if (_ == 0)
+    rc = forkpty(&pty);
+    if (rc == 0)
     {
         char *av[] = { "bash", NULL };
         execvp(av[0], av);
         perror("execvp");
         return EXIT_FAILURE;
     }
-    else if (_ < 0)
+    else if (rc < 0)
     {
         return EXIT_FAILURE;
     }

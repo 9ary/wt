@@ -7,7 +7,7 @@
 
 int openpty(struct pty *pty)
 {
-    int _;
+    int rc;
 
     pty->child_pid = 0;
 
@@ -18,15 +18,15 @@ int openpty(struct pty *pty)
         goto fail;
     }
 
-    _ = grantpt(pty->ptm);
-    if (_ < 0)
+    rc = grantpt(pty->ptm);
+    if (rc < 0)
     {
         perror("grantpt");
         goto close_ptm;
     }
 
-    _ = unlockpt(pty->ptm);
-    if (_ < 0)
+    rc = unlockpt(pty->ptm);
+    if (rc < 0)
     {
         perror("unlockpt");
         goto close_ptm;
@@ -49,10 +49,10 @@ fail:
 
 int forkpty(struct pty *pty)
 {
-    int _;
+    int rc;
 
-    _ = openpty(pty);
-    if (_ < 0)
+    rc = openpty(pty);
+    if (rc < 0)
         goto fail;
 
     pty->child_pid = fork();
@@ -61,20 +61,20 @@ int forkpty(struct pty *pty)
         close(pty->ptm);
         pty->ptm = -1;
 
-        _ = dup2(pty->pts, STDIN_FILENO);
-        if (_ < 0)
+        rc = dup2(pty->pts, STDIN_FILENO);
+        if (rc < 0)
         {
             perror("dup2");
             goto child_fail;
         }
-        _ = dup2(pty->pts, STDOUT_FILENO);
-        if (_ < 0)
+        rc = dup2(pty->pts, STDOUT_FILENO);
+        if (rc < 0)
         {
             perror("dup2");
             goto child_fail;
         }
-        _ = dup2(pty->pts, STDERR_FILENO);
-        if (_ < 0)
+        rc = dup2(pty->pts, STDERR_FILENO);
+        if (rc < 0)
         {
             perror("dup2");
             goto child_fail;
@@ -84,8 +84,8 @@ int forkpty(struct pty *pty)
 
         setsid();
 
-        _ = ioctl(STDIN_FILENO, TIOCSCTTY, 1);
-        if (_ < 0)
+        rc = ioctl(STDIN_FILENO, TIOCSCTTY, 1);
+        if (rc < 0)
         {
             perror("TIOCSCTTY");
             goto child_fail;

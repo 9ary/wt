@@ -1,72 +1,67 @@
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <termios.h>
 #include <unistd.h>
+
+#include "libwt/pty.h"
 
 int main(int argc, char *argv[])
 {
     (void) argc;
     (void) argv;
 
-    int ptm = posix_openpt(O_RDWR);
-    grantpt(ptm);
-    unlockpt(ptm);
-    int pts = open(ptsname(ptm), O_RDWR);
+    int _;
+    struct pty pty;
 
-    pid_t child = fork();
-    if (child == 0)
+    _ = forkpty(&pty);
+    if (_ == 0)
     {
-        close(ptm);
+        /* TODO: figure out what to do with this
+         * Supposedly the exec'd process would set the terminal to the mode it needs.
+         * Should we provide a default?
+         * Need to check how other terms do it.
+         */
         struct termios term_settings;
-        tcgetattr(pts, &term_settings);
+        tcgetattr(pty.pts, &term_settings);
         cfmakeraw(&term_settings);
-        tcsetattr(pts, TCSANOW, &term_settings);
-        dup2(pts, STDIN_FILENO);
-        dup2(pts, STDOUT_FILENO);
-        dup2(pts, STDERR_FILENO);
-        close(pts);
-        setsid();
-        ioctl(0, TIOCSCTTY, 1);
-        char *av[] = { "bash" };
+        tcsetattr(pty.pts, TCSANOW, &term_settings);
+
+        char *av[] = { "bash", NULL };
         execvp(av[0], av);
         perror("execvp");
         return EXIT_FAILURE;
     }
-    else if (child < 0)
+    else if (_ < 0)
     {
         return EXIT_FAILURE;
     }
-
-    close(pts);
 
     fd_set fd_in;
     while (1)
     {
         siginfo_t status;
         status.si_pid = 0;
-        waitid(P_PID, child, &status, WNOHANG | WEXITED);
+        waitid(P_PID, pty.child_pid, &status, WNOHANG | WEXITED);
         if (status.si_pid)
             break;
 
         FD_ZERO(&fd_in);
-        FD_SET(0, &fd_in);
-        FD_SET(ptm, &fd_in);
-        select(ptm + 1, &fd_in, NULL, NULL, NULL);
+        FD_SET(STDIN_FILENO, &fd_in);
+        FD_SET(pty.ptm, &fd_in);
+        select(pty.ptm + 1, &fd_in, NULL, NULL, NULL);
         if (FD_ISSET(0, &fd_in))
         {
             char buf[1024];
             ssize_t read_bytes = read(0, buf, 1024);
             if (read_bytes > 0)
-                write(ptm, buf, read_bytes);
+                write(pty.ptm, buf, read_bytes);
         }
 
-        if (FD_ISSET(ptm, &fd_in))
+        if (FD_ISSET(pty.ptm, &fd_in))
         {
             char buf[1024];
-            ssize_t read_bytes = read(ptm, buf, 1024);
+            ssize_t read_bytes = read(pty.ptm, buf, 1024);
             if (read_bytes > 0)
                 write(STDOUT_FILENO, buf, read_bytes);
         }

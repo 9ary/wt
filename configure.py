@@ -9,6 +9,7 @@ cflags_common = [ "-Wall", "-Wextra", "-pedantic" ]
 cflags_common += [ "-O2", "-flto" ]
 cflags_common += [ "-pipe" ]
 cflags_common += [ "-D_XOPEN_SOURCE=700", "-D_DEFAULT_SOURCE" ]
+cflags_common += [ "-I" + shogun.srcdir ]
 
 cflags = " ".join(cflags_common + [ "-std=c11" ])
 
@@ -21,8 +22,9 @@ if args.cflags:
     sys.exit()
 
 obj = shogun.Objects("src/*.c", "cc", "o")
-exe = shogun.Assembly("$builddir/wt", "ccld", obj,
+libwt = shogun.Objects("libwt/*.c", "cc", "o")
+exe = shogun.Assembly("$builddir/wt", "ccld", obj, libwt,
         options = { "libs": "" })
 comp_flags = shogun.Variables(cflags = cflags)
 
-shogun.build(obj, exe, comp_flags)
+shogun.build(obj, libwt, exe, comp_flags)

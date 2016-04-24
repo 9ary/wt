@@ -17,16 +17,6 @@ int main(int argc, char *argv[])
     _ = forkpty(&pty);
     if (_ == 0)
     {
-        /* TODO: figure out what to do with this
-         * Supposedly the exec'd process would set the terminal to the mode it needs.
-         * Should we provide a default?
-         * Need to check how other terms do it.
-         */
-        struct termios term_settings;
-        tcgetattr(pty.pts, &term_settings);
-        cfmakeraw(&term_settings);
-        tcsetattr(pty.pts, TCSANOW, &term_settings);
-
         char *av[] = { "bash", NULL };
         execvp(av[0], av);
         perror("execvp");
@@ -36,6 +26,12 @@ int main(int argc, char *argv[])
     {
         return EXIT_FAILURE;
     }
+
+    struct termios term_settings, term_settings_old;
+    tcgetattr(0, &term_settings_old);
+    term_settings = term_settings_old;
+    cfmakeraw(&term_settings);
+    tcsetattr(0, TCSANOW, &term_settings);
 
     fd_set fd_in;
     while (1)
@@ -66,5 +62,7 @@ int main(int argc, char *argv[])
                 write(STDOUT_FILENO, buf, read_bytes);
         }
     }
+
+    tcsetattr(0, TCSANOW, &term_settings_old);
     return EXIT_SUCCESS;
 }

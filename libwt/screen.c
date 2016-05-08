@@ -17,6 +17,10 @@ struct screen *screen_new(int width, int height, int buffer_lines)
     screen->first_line = 0;
     screen->buffer_lines = buffer_lines;
 
+    memset(&(screen->pen), 0, sizeof(struct screen_pen));
+    screen->pen.fg = -1;
+    screen->pen.bg = -1;
+
     screen->lines = malloc(buffer_lines * sizeof(struct screen_line));
     if (screen->lines == NULL)
     {
@@ -44,6 +48,7 @@ fail:
 void free_screen(struct screen *screen)
 {
     if (screen)
+    {
         if (screen->lines)
         {
             for (int i = 0; i < screen->buffer_lines; i++)
@@ -52,7 +57,8 @@ void free_screen(struct screen *screen)
             free(screen->lines);
         }
 
-    free(screen);
+        free(screen);
+    }
 }
 
 int screen_line_realloc(struct screen_line *line, int length)
@@ -65,10 +71,10 @@ int screen_line_realloc(struct screen_line *line, int length)
     }
 
     line->length = length;
+    line->cells = new_cells;
 
     return 0;
 
 fail:
     return -1;
 }
-

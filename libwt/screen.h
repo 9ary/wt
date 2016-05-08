@@ -46,6 +46,7 @@ struct screen
     int width, height;
     int first_line;
     int buffer_lines;
+    struct screen_pen pen;
     struct screen_line *lines;
 };
 

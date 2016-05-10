@@ -4,12 +4,17 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "libwt/log.h"
 #include "libwt/pty.h"
+
+#define LOG_TAG "main"
 
 int main(int argc, char *argv[])
 {
     (void) argc;
     (void) argv;
+
+    log_start(stderr, DEBUG);
 
     int rc;
     struct pty pty;
@@ -19,7 +24,7 @@ int main(int argc, char *argv[])
     {
         char *av[] = { "bash", NULL };
         execvp(av[0], av);
-        perror("execvp");
+        errlog(ERROR, "execvp");
         return EXIT_FAILURE;
     }
     else if (rc < 0)

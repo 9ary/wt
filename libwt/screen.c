@@ -1,14 +1,17 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "log.h"
 #include "screen.h"
+
+#define LOG_TAG "libwt/screen"
 
 struct screen *screen_new(int width, int height, int buffer_lines)
 {
     struct screen *screen = malloc(sizeof(struct screen));
     if (screen == NULL)
     {
-        perror("malloc");
+        errlog(ERROR, "malloc");
         goto fail;
     }
 
@@ -24,7 +27,7 @@ struct screen *screen_new(int width, int height, int buffer_lines)
     screen->lines = malloc(buffer_lines * sizeof(struct screen_line));
     if (screen->lines == NULL)
     {
-        perror("malloc");
+        errlog(ERROR, "malloc");
         goto free_screen;
     }
 
@@ -66,7 +69,7 @@ int screen_line_realloc(struct screen_line *line, int length)
     struct screen_cell *new_cells = realloc(line->cells, length * sizeof(struct screen_cell));
     if (new_cells == NULL)
     {
-        perror("realloc");
+        errlog(ERROR, "realloc");
         goto fail;
     }
 

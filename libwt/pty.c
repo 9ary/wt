@@ -1,9 +1,11 @@
 #include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
 
+#include "log.h"
 #include "pty.h"
+
+#define LOG_TAG "libwt/pty"
 
 int openpty(struct pty *pty)
 {
@@ -14,28 +16,28 @@ int openpty(struct pty *pty)
     pty->ptm = posix_openpt(O_RDWR);
     if (pty->ptm < 0)
     {
-        perror("posix_openpt");
+        errlog(ERROR, "posix_openpt");
         goto fail;
     }
 
     rc = grantpt(pty->ptm);
     if (rc < 0)
     {
-        perror("grantpt");
+        errlog(ERROR, "grantpt");
         goto close_ptm;
     }
 
     rc = unlockpt(pty->ptm);
     if (rc < 0)
     {
-        perror("unlockpt");
+        errlog(ERROR, "unlockpt");
         goto close_ptm;
     }
 
     pty->pts = open(ptsname(pty->ptm), O_RDWR);
     if (pty->pts < 0)
     {
-        perror("open");
+        errlog(ERROR, "open");
         goto close_ptm;
     }
 
@@ -64,19 +66,19 @@ int forkpty(struct pty *pty)
         rc = dup2(pty->pts, STDIN_FILENO);
         if (rc < 0)
         {
-            perror("dup2");
+            errlog(ERROR, "dup2");
             goto child_fail;
         }
         rc = dup2(pty->pts, STDOUT_FILENO);
         if (rc < 0)
         {
-            perror("dup2");
+            errlog(ERROR, "dup2");
             goto child_fail;
         }
         rc = dup2(pty->pts, STDERR_FILENO);
         if (rc < 0)
         {
-            perror("dup2");
+            errlog(ERROR, "dup2");
             goto child_fail;
         }
 
@@ -87,7 +89,7 @@ int forkpty(struct pty *pty)
         rc = ioctl(STDIN_FILENO, TIOCSCTTY, 1);
         if (rc < 0)
         {
-            perror("TIOCSCTTY");
+            errlog(ERROR, "TIOCSCTTY");
             goto child_fail;
         }
 
@@ -104,7 +106,7 @@ child_fail:
     }
     else
     {
-        perror("fork");
+        errlog(ERROR, "fork");
         goto close_pty;
     }
 

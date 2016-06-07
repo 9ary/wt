@@ -9,7 +9,7 @@ cflags_common = [ "-Wall", "-Wextra", "-pedantic" ]
 cflags_common += [ "-O2", "-flto" ]
 cflags_common += [ "-pipe" ]
 cflags_common += [ "-D_XOPEN_SOURCE=700", "-D_DEFAULT_SOURCE" ]
-cflags_common += [ "-I" + shogun.srcdir ]
+cflags_common += [ "-I" + shogun.cd ]
 
 cflags = " ".join(cflags_common + [ "-std=c11" ])
 

@@ -1,5 +1,5 @@
-#ifndef _PTY_H
-#define _PTY_H
+#ifndef INC_PTY_H
+#define INC_PTY_H
 
 #include <unistd.h>
 

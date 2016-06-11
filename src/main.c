@@ -42,10 +42,13 @@ int main(int argc, char *argv[])
     while (1)
     {
         siginfo_t status;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
         status.si_pid = 0;
-        waitid(P_PID, pty.child_pid, &status, WNOHANG | WEXITED);
+        waitid(P_PID, (unsigned) pty.child_pid, &status, WNOHANG | WEXITED);
         if (status.si_pid)
             break;
+#pragma clang diagnostic pop
 
         FD_ZERO(&fd_in);
         FD_SET(STDIN_FILENO, &fd_in);
@@ -56,7 +59,7 @@ int main(int argc, char *argv[])
             char buf[1024];
             ssize_t read_bytes = read(0, buf, 1024);
             if (read_bytes > 0)
-                write(pty.ptm, buf, read_bytes);
+                write(pty.ptm, buf, (unsigned) read_bytes);
         }
 
         if (FD_ISSET(pty.ptm, &fd_in))
@@ -64,7 +67,7 @@ int main(int argc, char *argv[])
             char buf[1024];
             ssize_t read_bytes = read(pty.ptm, buf, 1024);
             if (read_bytes > 0)
-                write(STDOUT_FILENO, buf, read_bytes);
+                write(STDOUT_FILENO, buf, (unsigned) read_bytes);
         }
     }
 

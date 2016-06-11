@@ -5,7 +5,7 @@ rule cc
     deps = gcc
 
 rule ccld
-    command = $cc $ldflags $libs $in -o $out
+    command = $cc $cflags $ldflags $libs $in -o $out
     description = CCLD $out
 
 include targets.ninja

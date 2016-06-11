@@ -1,5 +1,5 @@
-#ifndef _LOG_H
-#define _LOG_H
+#ifndef INC_LOG_H
+#define INC_LOG_H
 
 #include <errno.h>
 #include <stdio.h>
@@ -14,7 +14,7 @@ enum log_level
 };
 
 void log_start(FILE *file, enum log_level level);
-void log_stop();
+void log_stop(void);
 
 #define putlog(level, ...) _putlog(level, LOG_TAG, __VA_ARGS__)
 #define errlog(level, s) _putlog(level, LOG_TAG, "%s: %s", s, strerror(errno))

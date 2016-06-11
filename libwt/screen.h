@@ -1,5 +1,5 @@
-#ifndef _SCREEN_H
-#define _SCREEN_H
+#ifndef INC_SCREEN_H
+#define INC_SCREEN_H
 
 #include <stdint.h>
 
@@ -37,21 +37,21 @@ struct screen_cell
 
 struct screen_line
 {
-    int length;
+    unsigned int length;
     struct screen_cell *cells;
 };
 
 struct screen
 {
-    int width, height;
-    int first_line;
-    int buffer_lines;
+    unsigned int width, height;
+    unsigned int first_line;
+    unsigned int buffer_lines;
     struct screen_pen pen;
     struct screen_line *lines;
 };
 
-struct screen *screen_new(int width, int height, int buffer_lines);
+struct screen *screen_new(unsigned int width, unsigned int height, unsigned int buffer_lines);
 void free_screen(struct screen *screen);
-int screen_line_realloc(struct screen_line *line, int length);
+int screen_line_realloc(struct screen_line *line, unsigned int length);
 
 #endif

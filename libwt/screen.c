@@ -4,8 +4,6 @@
 #include "log.h"
 #include "screen.h"
 
-#define LOG_TAG "libwt/screen"
-
 struct screen *screen_new(unsigned int width, unsigned int height, unsigned int buffer_lines)
 {
     struct screen *screen = malloc(sizeof(struct screen));

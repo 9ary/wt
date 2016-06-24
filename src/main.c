@@ -7,8 +7,6 @@
 #include "libwt/log.h"
 #include "libwt/pty.h"
 
-#define LOG_TAG "main"
-
 int main(int argc, char *argv[])
 {
     (void) argc;

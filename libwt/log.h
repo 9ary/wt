@@ -16,8 +16,8 @@ enum log_level
 void log_start(FILE *file, enum log_level level);
 void log_stop(void);
 
-#define putlog(level, ...) _putlog(level, LOG_TAG, __VA_ARGS__)
-#define errlog(level, s) _putlog(level, LOG_TAG, "%s: %s", s, strerror(errno))
-void _putlog(enum log_level level, const char *tag, const char *format, ...);
+#define putlog(level, ...) _putlog(level, __FILE__, __LINE__, __VA_ARGS__)
+#define errlog(level, s) _putlog(level, __FILE__, __LINE__, "%s: %s", s, strerror(errno))
+void _putlog(enum log_level level, const char *file, const int line, const char *format, ...);
 
 #endif

@@ -25,7 +25,7 @@ void log_stop(void)
     log_file = NULL;
 }
 
-void _putlog(enum log_level level, const char *tag, const char *format, ...)
+void _putlog(enum log_level level, const char *file, const int line, const char *format, ...)
 {
     if (level < min_level || log_file == NULL)
         return;
@@ -33,7 +33,7 @@ void _putlog(enum log_level level, const char *tag, const char *format, ...)
     va_list args;
     va_start(args, format);
 
-    fprintf(log_file, "%s[%s] ", log_colors[level], tag);
+    fprintf(log_file, "%s[%s:%d] ", log_colors[level], file, line);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wformat-nonliteral"
     vfprintf(log_file, format, args);

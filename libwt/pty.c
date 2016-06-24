@@ -5,8 +5,6 @@
 #include "log.h"
 #include "pty.h"
 
-#define LOG_TAG "libwt/pty"
-
 int openpty(struct pty *pty)
 {
     int rc;

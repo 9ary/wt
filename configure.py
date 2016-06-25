@@ -6,11 +6,10 @@ import sys
 import shogun
 
 cflags_common = [ "-Weverything", "-Wno-padded", "-fdiagnostics-color=always" ]
-cflags_common += [ "-include include/clang_only.h" ]
 cflags_common += [ "-O2", "-flto" ]
 cflags_common += [ "-pipe" ]
 cflags_common += [ "-D_XOPEN_SOURCE=700", "-D_DEFAULT_SOURCE" ]
-cflags_common += [ "-I" + shogun.cd ]
+cflags_common += [ "-I." ]
 
 cflags = " ".join(cflags_common + [ "-std=c11" ])
 

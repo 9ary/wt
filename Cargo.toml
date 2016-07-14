@@ -2,5 +2,10 @@
 name = "wt"
 version = "0.1.0"
 authors = ["Dan Elkouby <streetwalrus@codewalr.us>"]
+build = "build.rs"
 
 [dependencies]
+libc = "0.2"
+
+[build-dependencies]
+gcc = "0.3"

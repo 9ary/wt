@@ -4,6 +4,13 @@ version = "0.1.0"
 authors = ["Dan Elkouby <streetwalrus@codewalr.us>"]
 build = "build.rs"
 
+[[bin]]
+name = "wt"
+path = "src/main.rs"
+
+[lib]
+path = "src/lib/mod.rs"
+
 [dependencies]
 libc = "0.2"
 

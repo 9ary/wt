@@ -4,7 +4,7 @@ use std::os::unix::ffi::OsStrExt;
 
 extern crate libc;
 
-use pty;
+use super::pty;
 
 #[repr(C)]
 #[allow(dead_code)]

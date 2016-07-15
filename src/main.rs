@@ -1,5 +1,7 @@
-mod pty;
-mod subprocess;
+extern crate wt;
+
+use wt::pty;
+use wt::subprocess;
 
 fn main() {
     let mut pty = pty::Pty::new().unwrap();

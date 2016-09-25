@@ -4,8 +4,11 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "aqueue.h"
+#include "coro.h"
 #include "log.h"
 #include "pty.h"
+#include "unicode.h"
 
 int main(int argc, char *argv[])
 {
@@ -29,6 +32,8 @@ int main(int argc, char *argv[])
     {
         return EXIT_FAILURE;
     }
+
+    struct unidecode *ud = unidecode_new(8192);
 
     struct termios term_settings, term_settings_old;
     tcgetattr(0, &term_settings_old);
@@ -62,13 +67,24 @@ int main(int argc, char *argv[])
 
         if (FD_ISSET(pty.ptm, &fd_in))
         {
-            char buf[1024];
-            ssize_t read_bytes = read(pty.ptm, buf, 1024);
-            if (read_bytes > 0)
-                write(STDOUT_FILENO, buf, (unsigned) read_bytes);
+            const uint32_t *utf32;
+            uint8_t out[4];
+            if (aqueue_read(ud->read_queue, pty.ptm, 4096))
+            {
+                coro_resume(ud->coro);
+                while (aqueue_empty(ud->out_queue) == 0)
+                {
+                    utf32 = aqueue_pop(ud->out_queue);
+                    int spit = utf32_to_utf8(*utf32, out);
+                    write(STDOUT_FILENO, out, (size_t) spit);
+                }
+            }
         }
     }
 
     tcsetattr(0, TCSANOW, &term_settings_old);
+
+    unidecode_free(ud);
+
     return EXIT_SUCCESS;
 }

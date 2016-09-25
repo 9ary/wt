@@ -22,9 +22,8 @@ if args.cflags:
     sys.exit()
 
 obj = shogun.Objects("src/*.c", "cc", "o")
-libwt = shogun.Objects("libwt/*.c", "cc", "o")
-exe = shogun.Assembly("$builddir/wt", "ccld", obj, libwt,
+exe = shogun.Assembly("$builddir/wt", "ccld", obj,
         options = { "libs": "" })
 comp_flags = shogun.Variables(cflags = cflags)
 
-shogun.build(obj, libwt, exe, comp_flags)
+shogun.build(obj, exe, comp_flags)

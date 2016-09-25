@@ -4,8 +4,8 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include "libwt/log.h"
-#include "libwt/pty.h"
+#include "log.h"
+#include "pty.h"
 
 int main(int argc, char *argv[])
 {

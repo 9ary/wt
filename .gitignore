@@ -1,4 +1,5 @@
 build
+etc
 .ninja_log
 .ninja_deps
 targets.ninja

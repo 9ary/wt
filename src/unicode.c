@@ -140,39 +140,3 @@ int utf32_to_utf8(uint32_t in, uint8_t *out)
 
     return len;
 }
-
-/*
-enum
-{
-    READ_SIZE = 4096
-};
-
-int main(int argc, char *argv[])
-{
-    (void) argc;
-    (void) argv;
-
-    struct coro *utf8_coro = coro_new(&utf8_to_utf32);
-    read_queue = aqueue_new(sizeof(uint8_t), READ_SIZE);
-    out_queue = aqueue_new(sizeof(uint32_t), READ_SIZE);
-
-    const uint32_t *utf32;
-    uint8_t out[4];
-    while (aqueue_read(read_queue, STDIN_FILENO, READ_SIZE))
-    {
-        coro_resume(utf8_coro);
-        while (aqueue_empty(out_queue) == 0)
-        {
-            utf32 = aqueue_pop(out_queue);
-            int spit = utf32_to_utf8(*utf32, out);
-            write(STDOUT_FILENO, out, (size_t) spit);
-        }
-    }
-
-    aqueue_free(out_queue);
-    aqueue_free(read_queue);
-    coro_free(utf8_coro);
-
-    return 0;
-}
-*/

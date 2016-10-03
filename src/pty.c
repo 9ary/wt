@@ -7,35 +7,22 @@
 
 int openpty(struct pty *pty)
 {
-    int rc;
-
     pty->child_pid = 0;
 
     pty->ptm = posix_openpt(O_RDWR);
     if (pty->ptm < 0)
     {
-        errlog(ERROR, "posix_openpt");
+        errlog(ERROR, "Failed to open PTY master");
         goto fail;
     }
 
-    rc = grantpt(pty->ptm);
-    if (rc < 0)
-    {
-        errlog(ERROR, "grantpt");
-        goto close_ptm;
-    }
-
-    rc = unlockpt(pty->ptm);
-    if (rc < 0)
-    {
-        errlog(ERROR, "unlockpt");
-        goto close_ptm;
-    }
+    grantpt(pty->ptm);
+    unlockpt(pty->ptm);
 
     pty->pts = open(ptsname(pty->ptm), O_RDWR);
     if (pty->pts < 0)
     {
-        errlog(ERROR, "open");
+        errlog(ERROR, "Failed to open PTY slave");
         goto close_ptm;
     }
 
@@ -61,40 +48,17 @@ int forkpty(struct pty *pty)
         close(pty->ptm);
         pty->ptm = -1;
 
-        rc = dup2(pty->pts, STDIN_FILENO);
-        if (rc < 0)
-        {
-            errlog(ERROR, "dup2");
-            goto child_fail;
-        }
-        rc = dup2(pty->pts, STDOUT_FILENO);
-        if (rc < 0)
-        {
-            errlog(ERROR, "dup2");
-            goto child_fail;
-        }
-        rc = dup2(pty->pts, STDERR_FILENO);
-        if (rc < 0)
-        {
-            errlog(ERROR, "dup2");
-            goto child_fail;
-        }
+        dup2(pty->pts, STDIN_FILENO);
+        dup2(pty->pts, STDOUT_FILENO);
+        dup2(pty->pts, STDERR_FILENO);
 
         close(pty->pts);
 
         setsid();
 
-        rc = ioctl(STDIN_FILENO, TIOCSCTTY, 1);
-        if (rc < 0)
-        {
-            errlog(ERROR, "TIOCSCTTY");
-            goto child_fail;
-        }
+        ioctl(STDIN_FILENO, TIOCSCTTY, 1);
 
         return 0;
-
-child_fail:
-        exit(EXIT_FAILURE);
     }
     else if (pty->child_pid > 0)
     {

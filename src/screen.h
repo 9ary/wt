@@ -52,6 +52,6 @@ struct screen
 
 struct screen *screen_new(unsigned int width, unsigned int height, unsigned int buffer_lines);
 void free_screen(struct screen *screen);
-int screen_line_realloc(struct screen_line *line, unsigned int length);
+void screen_line_realloc(struct screen_line *line, unsigned int length);
 
 #endif

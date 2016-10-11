@@ -8,6 +8,7 @@
 #include "coro.h"
 #include "log.h"
 #include "pty.h"
+#include "screen.h"
 #include "unicode.h"
 
 int main(int argc, char *argv[])
@@ -34,6 +35,7 @@ int main(int argc, char *argv[])
     }
 
     struct unidecode *ud = unidecode_new(8192);
+    struct screen *s = screen_new(80, 24, 1024);
 
     struct termios term_settings, term_settings_old;
     tcgetattr(0, &term_settings_old);
@@ -59,8 +61,8 @@ int main(int argc, char *argv[])
         select(pty.ptm + 1, &fd_in, NULL, NULL, NULL);
         if (FD_ISSET(0, &fd_in))
         {
-            char buf[1024];
-            ssize_t read_bytes = read(0, buf, 1024);
+            char buf[4096];
+            ssize_t read_bytes = read(0, buf, 4096);
             if (read_bytes > 0)
                 write(pty.ptm, buf, (unsigned) read_bytes);
         }
@@ -76,6 +78,7 @@ int main(int argc, char *argv[])
                 {
                     utf32 = aqueue_pop(ud->out_queue);
                     int spit = utf32_to_utf8(*utf32, out);
+                    screen_putchar(s, *utf32);
                     write(STDOUT_FILENO, out, (size_t) spit);
                 }
             }
@@ -84,6 +87,7 @@ int main(int argc, char *argv[])
 
     tcsetattr(0, TCSANOW, &term_settings_old);
 
+    screen_free(s);
     unidecode_free(ud);
 
     return EXIT_SUCCESS;

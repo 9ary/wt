@@ -1,3 +1,4 @@
+#include <poll.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -43,7 +44,18 @@ int main(int argc, char *argv[])
     cfmakeraw(&term_settings);
     tcsetattr(0, TCSANOW, &term_settings);
 
-    fd_set fd_in;
+    struct pollfd pollset[] =
+    {
+        {
+            .fd = STDIN_FILENO,
+            .events = POLLIN
+        },
+        {
+            .fd = pty.ptm,
+            .events = POLLIN
+        }
+    };
+
     while (1)
     {
         siginfo_t status;
@@ -55,11 +67,9 @@ int main(int argc, char *argv[])
             break;
 #pragma clang diagnostic pop
 
-        FD_ZERO(&fd_in);
-        FD_SET(STDIN_FILENO, &fd_in);
-        FD_SET(pty.ptm, &fd_in);
-        select(pty.ptm + 1, &fd_in, NULL, NULL, NULL);
-        if (FD_ISSET(0, &fd_in))
+        poll(pollset, sizeof(pollset) / sizeof(struct pollfd), 1000);
+
+        if (pollset[0].revents & POLLIN)
         {
             char buf[4096];
             ssize_t read_bytes = read(0, buf, 4096);
@@ -67,7 +77,7 @@ int main(int argc, char *argv[])
                 write(pty.ptm, buf, (unsigned) read_bytes);
         }
 
-        if (FD_ISSET(pty.ptm, &fd_in))
+        if (pollset[1].revents & POLLIN)
         {
             const uint32_t *utf32;
             uint8_t out[4];

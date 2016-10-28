@@ -12,6 +12,4 @@ include targets.ninja
 
 cc = clang
 
-ldflags = -fuse-ld=gold -flto
-
 default $builddir/wt

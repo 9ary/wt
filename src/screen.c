@@ -76,19 +76,19 @@ void screen_putchar(struct screen *screen, uint32_t codepoint)
 
     switch (codepoint)
     {
-        case '\r':
-            screen_put_cr(screen);
-            break;
+    case '\r':
+        screen_put_cr(screen);
+        break;
 
-        case '\n':
-            screen_put_lf(screen);
-            break;
+    case '\n':
+        screen_put_lf(screen);
+        break;
 
-        default:
-            line->cells[screen->cursor.col] = (struct screen_cell) { codepoint, screen->pen };
+    default:
+        line->cells[screen->cursor.col] = (struct screen_cell) { codepoint, screen->pen };
 
-            screen->cursor.col++;
-            if (screen->cursor.col >= line->length)
-                screen_line_realloc(line, line->length + 64);
+        screen->cursor.col++;
+        if (screen->cursor.col >= line->length)
+            screen_line_realloc(line, line->length + 64);
     }
 }

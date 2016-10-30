@@ -124,18 +124,18 @@ int utf32_to_utf8(uint32_t in, uint8_t *out)
 
     switch (len)
     {
-        case 1:
-            out[0] = 0x00 | (in & 0x7F);
-            break;
-        case 2:
-            out[0] = 0xC0 | (in & 0x1F);
-            break;
-        case 3:
-            out[0] = 0xE0 | (in & 0x0F);
-            break;
-        case 4:
-            out[0] = 0xF0 | (in & 0x07);
-            break;
+    case 1:
+        out[0] = 0x00 | (in & 0x7F);
+        break;
+    case 2:
+        out[0] = 0xC0 | (in & 0x1F);
+        break;
+    case 3:
+        out[0] = 0xE0 | (in & 0x0F);
+        break;
+    case 4:
+        out[0] = 0xF0 | (in & 0x07);
+        break;
     }
 
     return len;

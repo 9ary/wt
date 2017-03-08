@@ -13,6 +13,10 @@ cflags_common += [ "-I." ]
 
 cflags = " ".join(cflags_common + [ "-std=c11" ])
 
+ldflags = "-flto"
+if sys.platform != "darwin":
+    ldflags += " -fuse-ld=gold"
+
 parser = argparse.ArgumentParser(description = "Configure the build")
 parser.add_argument("--cflags", action = "store_true", help = "Print cflags")
 args = parser.parse_args()
@@ -24,6 +28,6 @@ if args.cflags:
 obj = shogun.Objects("src/*.c", "cc", "o")
 exe = shogun.Assembly("$builddir/wt", "ccld", obj,
         options = { "libs": "" })
-comp_flags = shogun.Variables(cflags = cflags)
+comp_flags = shogun.Variables(cflags = cflags, ldflags = ldflags)
 
 shogun.build(obj, exe, comp_flags)
